@@ -25,7 +25,12 @@
           </el-col>
           <el-col :span="1" :offset="0">
             <div style="position: absulute">
-              <el-button type="primary" icon="el-icon-search">搜索</el-button>
+              <el-button
+                type="primary"
+                icon="el-icon-search"
+                v-on:click="send_url"
+                >搜索</el-button
+              >
             </div>
           </el-col>
         </el-row>
@@ -37,7 +42,7 @@
           mode="horizontal"
           @select="handleSelect"
         >
-          <el-menu-item index="1" style="margin-left:15%">class1</el-menu-item>
+          <el-menu-item index="1" style="margin-left: 15%">class1</el-menu-item>
           <el-menu-item index="2">class2</el-menu-item>
           <el-menu-item index="3">class3</el-menu-item>
           <el-menu-item index="4">class4</el-menu-item>
@@ -53,7 +58,7 @@
     </el-container>
   </div>
 </template>
-<script>
+<script >
 export default {
   data () {
     return {
@@ -66,6 +71,19 @@ export default {
   methods: {
     handleSelect (key, keyPath) {
       console.log(key, keyPath)
+    },
+    send_url: function (url) {
+      //发送 post 请求
+      this.$axios.post('/user', {
+        firstName: 'Fred',
+        lastName: 'Flintstone'
+      })
+        .then(function (response) {
+          console.log(response)
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
     }
   }
 }
@@ -100,8 +118,8 @@ export default {
 .input-with-select .el-input-group__prepend {
   background-color: #fff;
 }
-.el-menu-item{
-  width: 7%
+.el-menu-item {
+  width: 7%;
 }
 </style>
 
