@@ -153,10 +153,16 @@ export default {
         }
       })
 
-      // console.log('image number: ', image_path_list.length)
-      // console.log('have_get_image_number: ', this.have_get_image_number)
       let image_number = image_path_list.length
 
+      if (image_number > this.have_get_image_number) {
+        let not_get_image_number = image_number - this.have_get_image_number
+        for (var i = 0; i < not_get_image_number; i++) {
+          let index = this.have_get_image_number + i
+          console.log(index)
+        }
+      }
+      /*
       if (image_number > this.have_get_image_number) {
         let not_get_image_number = image_number - this.have_get_image_number
         // 数量整除部分
@@ -164,16 +170,17 @@ export default {
           for (var j = 0; j < this.row_image_number; j++) {
             let index = this.have_get_image_number + i * this.row_image_number + j
             // console.log('index', index)
+ 
           }
         }
-
+ 
         let yushu = not_get_image_number % this.row_image_number
         // 数量余数部分
         for (var i = 0; i < yushu; i++) {
           let index = image_number - (yushu - i)
           console.log('index', index)
         }
-      }
+      }*/
       this.have_get_image_number = image_number
 
       clearInterval(this.timer)
