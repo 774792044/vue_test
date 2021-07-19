@@ -29,9 +29,9 @@
                 type="primary"
                 icon="el-icon-search"
                 v-on:click="send_url"
-                >搜索</el-button
-              >
-              <button @click="add('a-component', 'test')">Add A</button>
+                >搜索
+              </el-button>
+              <button @click="add()">Add A</button>
             </div>
           </el-col>
         </el-row>
@@ -56,24 +56,22 @@
           <el-menu-item index="10">class10</el-menu-item>
         </el-menu>
         <el-row
+          id="row1"
           style="margin-top: 20px"
           :gutter="20"
           type="flex"
           justify="center"
-          v-for="item in items"
-          :key="item[0]"
+          v-for="item in items.length"
+          :key="item"
         >
-          <el-col :span="4" v-for="o in row_image_number" :key="o">
+          <el-col :span="4" v-for="url in items[item - 1]" :key="url">
+            <p>{{ url }}</p>
             <el-card shadow="hover" :body-style="{ padding: '0px' }">
-              <img
-                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-                class="image"
-              />
+              <img :src="url" class="image" />
+              <!-- <img src="../../images/1.jpeg" class="image" /> -->
+              <!-- <img src="images/1.jpeg" class="image" /> -->
               <div style="padding: 14px">
-                <span>好吃的汉堡</span>
-                <!-- <div class="bottom clearfix">
-                  <el-button type="text" class="button">操作按钮</el-button>
-                </div> -->
+                <span>{{ item.text }}</span>
               </div>
             </el-card>
           </el-col>
@@ -85,10 +83,25 @@
 </template>
 <script >
 import Vue from 'vue'
+
 var AComponent = Vue.extend({
   props: ['text'],
   template: '<li>A Component: {{ text }}</li>'
 })
+
+var BComponent = Vue.extend({
+  props: ['image_path'],
+  template:
+    '< el - col : span="4" v-for= "o in row_image_number" : key = "o" > \
+      <el-card shadow="hover" : body-style="{ padding: "0px" }"> \
+        <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" class="image" /> \
+        <div style="padding: 14px"> \
+          <span>好吃的汉堡</span> \
+        </div> \
+      </el-card> \
+    </el - col > '
+})
+
 export default {
   components: {
     // eslint-disable-next-line vue/no-unused-components
@@ -102,7 +115,7 @@ export default {
       activeIndex2: '1',
       items: [],
       row_image_number: 6,
-      image_dir: '/image',
+      image_dir: '/home/zhuozj/project/vue_test/images',
       have_get_image_number: 0,
     }
   },
@@ -110,56 +123,82 @@ export default {
     handleSelect (key, keyPath) {
       console.log(key, keyPath)
     },
-    add (component, text) {
-      this.items.push({
-        'component': component,
-        'text': text,
-      })
+    add () {
+      this.items.push([require("/images/1.jpeg"), require("/images/2.jpeg")])
+      console.log(this.items)
     },
     show_image () {
-      const that = this
-      let files = require.context('/image', false).keys()
-      // let files = require.context('/' + that.image_dir, false).keys()
-      console.log('files lenght: ', files.length)
-      console.log('have_get_image_number: ', that.have_get_image_number)
-      let files_number = files.length
-      that.have_get_image_number = files_number
-      /*
-      if (files_number > that.have_get_image_number) {
-        let not_get_image_number = files_number - that.have_get_image_number
-        for (var i = 0; i < parseInt(not_get_image_number / that.row_image_number); i++) {
-          for (var j = 0; j < that.row_image_number; j++) {
-            let index = that.have_get_image_number + i * that.row_image_number + j
-            console.log('index', index)
+      let image_path_list = []
+      // this.$axios({
+      //   method: 'GET',
+      //   url: `http://127.0.0.1:5000/get_image_path?path=${this.image_dir}`,
+      //   async: false,
+      //   // headers: {
+      //   //   'Accept': '*/*',
+      //   //   'Content-Type': 'application/x-www-form-urlencoded'
+      //   // }
+      // }).then(function (response) {
+      //   image_number = response.data['image_path_list'].length
+      //   console.log('1 image number: ', image_number)
+      // })
+
+      this.$jquery.ajax({
+        url: `http://127.0.0.1:5000/get_image_path?path=${this.image_dir}`,
+        type: 'GET', //GET
+        async: false, //或false,是否异步
+        success: function (response, textStatus, jqXHR) {
+          image_path_list = response['image_path_list']
+        },
+        complete: function () {
+        }
+      })
+
+      // console.log('image number: ', image_path_list.length)
+      // console.log('have_get_image_number: ', this.have_get_image_number)
+      let image_number = image_path_list.length
+
+      if (image_number > this.have_get_image_number) {
+        let not_get_image_number = image_number - this.have_get_image_number
+        // 数量整除部分
+        for (var i = 0; i < parseInt(not_get_image_number / this.row_image_number); i++) {
+          for (var j = 0; j < this.row_image_number; j++) {
+            let index = this.have_get_image_number + i * this.row_image_number + j
+            // console.log('index', index)
           }
         }
-      }*/
-      clearInterval(that.timer)
-      that.timer = null
+
+        let yushu = not_get_image_number % this.row_image_number
+        // 数量余数部分
+        for (var i = 0; i < yushu; i++) {
+          let index = image_number - (yushu - i)
+          console.log('index', index)
+        }
+      }
+      this.have_get_image_number = image_number
+
+      clearInterval(this.timer)
+      this.timer = null
     },
     send_url (url) {
-      //#### 
-      console.log('have_get_image_number: ', this.have_get_image_number)
-      // ####
-
+      // TODO  发送爬取图片请求
+      /*
+      this.$jquery.ajax({
+        url: `http://127.0.0.1:5000/get_image_path?path=${this.image_dir}`,
+        type: 'GET', //GET
+        async: false, //或false,是否异步
+        success: function (response, textStatus, jqXHR) {
+          image_path_list = response['image_path_list']
+        },
+        complete: function () {
+        }
+      })*/
 
       // 启动扫描文件夹定时器
-      // if (this.timer == null) {
-      //   this.timer = setInterval(() => {
-      //     this.show_image()
-      //   }, 1000)
-      // }
-      //发送 post 请求
-      // this.$axios.post('/user', {
-      //   firstName: 'Fred',
-      //   lastName: 'Flintstone'
-      // })
-      //   .then(function (response) {
-      //     console.log(response)
-      //   })
-      //   .catch(function (error) {
-      //     console.log(error)
-      //   })
+      if (this.timer == null) {
+        this.timer = setInterval(() => {
+          this.show_image()
+        }, 1000)
+      }
     },
   }
 }

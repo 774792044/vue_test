@@ -4,8 +4,10 @@ import router from '@/router/index.js'
 import Element from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
-import axios from 'axios'
-Vue.prototype.$axios = axios
+// import axios from 'axios'
+// Vue.prototype.$axios = axios
+import jquery from 'jquery'
+Vue.prototype.$jquery = jquery
 
 Vue.use(Element)
 
