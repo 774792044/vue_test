@@ -31,7 +31,7 @@
                 v-on:click="send_url"
                 >搜索
               </el-button>
-              <button @click="add()">Add A</button>
+              <!-- <button @click="add()">Add A</button> -->
             </div>
           </el-col>
         </el-row>
@@ -44,19 +44,20 @@
           mode="horizontal"
           @select="handleSelect"
         >
-          <el-menu-item index="1" style="margin-left: 15%">class1</el-menu-item>
-          <el-menu-item index="2">class2</el-menu-item>
-          <el-menu-item index="3">class3</el-menu-item>
-          <el-menu-item index="4">class4</el-menu-item>
-          <el-menu-item index="5">class5</el-menu-item>
-          <el-menu-item index="6">class6</el-menu-item>
-          <el-menu-item index="7">class7</el-menu-item>
-          <el-menu-item index="8">class8</el-menu-item>
-          <el-menu-item index="9">class9</el-menu-item>
-          <el-menu-item index="10">class10</el-menu-item>
+          <el-menu-item index="class1" style="margin-left: 15%"
+            >class1</el-menu-item
+          >
+          <el-menu-item index="class2">class2</el-menu-item>
+          <el-menu-item index="class3">class3</el-menu-item>
+          <el-menu-item index="class4">class4</el-menu-item>
+          <el-menu-item index="class5">class5</el-menu-item>
+          <el-menu-item index="class6">class6</el-menu-item>
+          <el-menu-item index="class7">class7</el-menu-item>
+          <el-menu-item index="class8">class8</el-menu-item>
+          <el-menu-item index="class9">class9</el-menu-item>
+          <el-menu-item index="class10">class10</el-menu-item>
         </el-menu>
         <el-row
-          id="row1"
           style="margin-top: 20px"
           :gutter="20"
           type="flex"
@@ -65,9 +66,11 @@
           :key="item"
         >
           <el-col :span="4" v-for="url in items[item - 1]" :key="url">
-            <p>{{ url }}</p>
-            <el-card shadow="hover" :body-style="{ padding: '0px' }">
-              <img :src="url" class="image" />
+            <el-card
+              shadow="hover"
+              :body-style="{ padding: '0px', height: '100%' }"
+            >
+              <img :src="require(`../assets/images/${url}`)" class="image" />
               <!-- <img src="../../images/1.jpeg" class="image" /> -->
               <!-- <img src="images/1.jpeg" class="image" /> -->
               <div style="padding: 14px">
@@ -77,7 +80,6 @@
           </el-col>
         </el-row>
       </el-main>
-      <el-footer>Footer</el-footer>
     </el-container>
   </div>
 </template>
@@ -89,19 +91,6 @@ var AComponent = Vue.extend({
   template: '<li>A Component: {{ text }}</li>'
 })
 
-var BComponent = Vue.extend({
-  props: ['image_path'],
-  template:
-    '< el - col : span="4" v-for= "o in row_image_number" : key = "o" > \
-      <el-card shadow="hover" : body-style="{ padding: "0px" }"> \
-        <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" class="image" /> \
-        <div style="padding: 14px"> \
-          <span>好吃的汉堡</span> \
-        </div> \
-      </el-card> \
-    </el - col > '
-})
-
 export default {
   components: {
     // eslint-disable-next-line vue/no-unused-components
@@ -109,23 +98,21 @@ export default {
   },
   data: function () {
     return {
-      input: '',
-      select: '',
-      activeIndex: '1',
-      activeIndex2: '1',
+      input: '请输入URL',
+      select: 'http://',
+      activeIndex: 'class1',
+      current_class: 'class1',
       items: [],
       row_image_number: 6,
-      image_dir: '/home/zhuozj/project/vue_test/images',
+      image_dir: '/home/zhuozj/project/vue_test/src/assets/images',
       have_get_image_number: 0,
     }
   },
   methods: {
     handleSelect (key, keyPath) {
-      console.log(key, keyPath)
-    },
-    add () {
-      this.items.push([require("/images/1.jpeg"), require("/images/2.jpeg")])
-      console.log(this.items)
+      this.items = []
+      this.current_class = String(key)
+      this.have_get_image_number = 0
     },
     show_image () {
       let image_path_list = []
@@ -143,7 +130,7 @@ export default {
       // })
 
       this.$jquery.ajax({
-        url: `http://127.0.0.1:5000/get_image_path?path=${this.image_dir}`,
+        url: `http://127.0.0.1:5000/get_image_path?path=${this.image_dir}/${this.current_class}`,
         type: 'GET', //GET
         async: false, //或false,是否异步
         success: function (response, textStatus, jqXHR) {
@@ -152,6 +139,9 @@ export default {
         complete: function () {
         }
       })
+      if (image_path_list == []) {
+        return None
+      }
 
       let image_number = image_path_list.length
 
@@ -159,9 +149,15 @@ export default {
         let not_get_image_number = image_number - this.have_get_image_number
         for (var i = 0; i < not_get_image_number; i++) {
           let index = this.have_get_image_number + i
-          console.log(index)
+          // console.log(index)
+
+          if ((this.items.length == 0 || this.items[this.items.length - 1].length == this.row_image_number)) {
+            this.items.push([])
+          }
+          this.items[this.items.length - 1].push(this.current_class + '/' + image_path_list[index])
         }
       }
+
       /*
       if (image_number > this.have_get_image_number) {
         let not_get_image_number = image_number - this.have_get_image_number
@@ -183,22 +179,21 @@ export default {
       }*/
       this.have_get_image_number = image_number
 
-      clearInterval(this.timer)
-      this.timer = null
+      // clearInterval(this.timer)
+      // this.timer = null
     },
     send_url (url) {
       // TODO  发送爬取图片请求
-      /*
       this.$jquery.ajax({
-        url: `http://127.0.0.1:5000/get_image_path?path=${this.image_dir}`,
+        url: `http://127.0.0.1:5000/crawl_image?url=${this.select}/${this.input}`,
         type: 'GET', //GET
         async: false, //或false,是否异步
         success: function (response, textStatus, jqXHR) {
-          image_path_list = response['image_path_list']
+          console.log(response)
         },
         complete: function () {
         }
-      })*/
+      })
 
       // 启动扫描文件夹定时器
       if (this.timer == null) {
